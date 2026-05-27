@@ -15,7 +15,6 @@ Admins can manage settings and the screen rotation at `/admin` using the passwor
 ```shell
 echo ADMIN_PASSWORD=YourPassword > .env
 pipenv run python run.py
-# or: pipenv run flask run --no-reload   # required with SQLite if using flask run
 ```
 
 ## Deploy
