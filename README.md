@@ -1,4 +1,4 @@
-[![ProjectHUD CI](https://github.com/FRC-1721/ProjectHud/actions/workflows/build_docker.yml/badge.svg)](https://github.com/FRC-1721/ProjectHud/actions/workflows/build_docker.yml)
+[![ProjectHUD CI](https://github.com/MillyardLabs/ProjectHud/actions/workflows/build_docker.yml/badge.svg)](https://github.com/MillyardLabs/ProjectHud/actions/workflows/build_docker.yml)
 
 # Project Hud
 
@@ -26,7 +26,8 @@ Deployment is handled with docker.
 
 services:
   project_hud:
-    image: ghcr.io/frc-1721/project_hud-bot:main
+    # CI publishes ghcr.io/<owner>/<repo>:<branch> (lowercased) on push
+    image: ghcr.io/millyardlabs/projecthud:main
     environment:
       TZ: America/New_York
       GITHUB_TOKEN: YOUR_TOKEN
