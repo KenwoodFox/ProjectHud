@@ -9,5 +9,12 @@ services:
       GITHUB_TOKEN:
       GITHUB_REPOS:
       USERNAME_MAP:
+      ADMIN_PASSWORD:
+      DATABASE_PATH: /app/data/projecthud.db
+    volumes:
+      - project_hud_data:/app/data
     restart: "no"
     command: "true"
+
+volumes:
+  project_hud_data:

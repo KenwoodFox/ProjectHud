@@ -1,4 +1,6 @@
 .db
+data/
 __pycache__
 .env
+.flaskenv
 node_modules/

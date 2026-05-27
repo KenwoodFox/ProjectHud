@@ -311,12 +311,177 @@ body {
 }
 
 /* ========================= */
+/* Commits & CI feed (not issue cards) */
+/* ========================= */
+
+#activity-stats {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 5px;
+}
+
+.feed-panel {
+  max-height: 42vh;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 36vh;
+}
+
+.feed-row {
+  display: grid;
+  grid-template-columns: 100px 72px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #333;
+  border: 1px solid #444;
+  border-left: 3px solid #666;
+  font-size: 13px;
+}
+
+.feed-row:hover {
+  border-left-color: #ffa500;
+}
+
+.feed-repo {
+  color: #ffa500;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-sha {
+  font-family: monospace;
+  color: #8ec8ff;
+  font-size: 14px;
+}
+
+.feed-body {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-meta {
+  color: #888;
+  font-size: 11px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.feed-empty,
+.activity-empty {
+  margin: 0;
+  color: #777;
+  font-style: italic;
+}
+
+/* CI rows: status column instead of sha */
+.feed-row-ci {
+  grid-template-columns: 76px 100px minmax(0, 1fr) auto;
+}
+
+.feed-status {
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  text-transform: lowercase;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.feed-status-pass {
+  color: #4caf50;
+  border: 1px solid #4caf50;
+}
+
+.feed-status-run {
+  color: #ffc107;
+  border: 1px solid #ffc107;
+}
+
+.feed-status-fail {
+  color: #fff;
+  background: #f44336;
+  border: 2px solid #ff8a80;
+  animation: ci-fail-flash 1s infinite steps(2, end);
+}
+
+@keyframes ci-fail-flash {
+  0% {
+    background: #f44336;
+  }
+  100% {
+    background: #7a0000;
+  }
+}
+
+/* Projects list */
+#projects {
+  margin: 10px;
+  padding: 10px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+#projects h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  border-bottom: 1px solid #666;
+  padding-bottom: 5px;
+}
+
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.project-entry {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.project-repo {
+  color: #ffa500;
+  font-weight: bold;
+}
+
+.project-title {
+  font-weight: bold;
+}
+
+.project-desc {
+  grid-column: 2;
+  color: #888;
+  font-size: 11px;
+}
+
+/* ========================= */
 /* Responsive Tweaks         */
 /* ========================= */
 
 /* Ensure proper display on smaller screens */
 @media (max-width: 768px) {
-  #stats {
+  #stats,
+  #activity-stats {
     flex-direction: column;
   }
 

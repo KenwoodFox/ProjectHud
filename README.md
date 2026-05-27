@@ -2,15 +2,20 @@
 
 # Project Hud
 
-Flask server for displaying a quick development HUD (built specifically for use with FRC1721's code environment.
+Flask server for displaying a quick development HUD (built originally for use with FRC1721's code environment.)
 
 ![image](https://github.com/user-attachments/assets/84932072-f848-4ab0-b196-a35a51713776)
+
+## Configuration
+
+Admins can manage settings and the screen rotation at `/admin` using the password from `ADMIN_PASSWORD`.
 
 ## Development
 
 ```shell
-pipenv shell
-flask run --debug
+echo ADMIN_PASSWORD=YourPassword > .env
+pipenv run python run.py
+# or: pipenv run flask run --no-reload   # required with SQLite if using flask run
 ```
 
 ## Deploy
@@ -27,7 +32,8 @@ services:
       TZ: America/New_York
       GITHUB_TOKEN: YOUR_TOKEN
       GITHUB_REPOS: YOUR,REPOS
-      USERNAME_MAP: username:realname,
+      ADMIN_PASSWORD: YourPassword
+      DATABASE_PATH: data/projecthud.db # Optional
       REFRESH_DURATION: 25 # Optional
       API_REFRESH_DURATION: 200 # Optional
 ```

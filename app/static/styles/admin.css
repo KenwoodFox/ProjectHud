@@ -1,0 +1,20 @@
+/* bare minimum */
+body {
+  margin: 1em;
+  font-family: sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #999;
+  padding: 2px 6px;
+  vertical-align: top;
+}
+
+form.inline {
+  display: inline;
+}

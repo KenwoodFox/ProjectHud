@@ -1,40 +1,32 @@
 import os
-import threading
 
 from flask import Flask
 
+from app.extensions import db
+from app.filters.time_formatter import time_ago
+from app.routes.admin import admin_bp
 from app.routes.index import index_bp
 from app.routes.screens import screens_bp
-from app.filters.time_formatter import time_ago
-
-#from app.services.github_service import GitHubService
-
-
-app = Flask(__name__)
-
-# Filters
-app.jinja_env.filters["time_ago"] = time_ago
 
 
 def create_app():
-    # Register Blueprints
+    from config import database_uri, get_config
+
+    from app import models, store  # noqa: F401
+
+    app = Flask(__name__)
+    app.jinja_env.filters["time_ago"] = time_ago
+
+    app.config.from_object(get_config())
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_uri()
+    app.secret_key = os.getenv("SECRET_KEY", app.config["SECRET_KEY"])
+
+    db.init_app(app)
+    with app.app_context():
+        store.init_db()
+
     app.register_blueprint(index_bp)
     app.register_blueprint(screens_bp)
-
-    # Initialize GitHubService
-    username_mapping = {
-        pair.split(":")[0]: pair.split(":")[1]
-        for pair in os.getenv("USERNAME_MAP", "").split(",")
-        if ":" in pair
-    }
-
-    # Register service with app
-#    app.github_service = GitHubService(
-#        token=os.getenv("GITHUB_TOKEN"),
-#        repos=os.getenv("GITHUB_REPOS", "").split(","),
-#        username_mapping=username_mapping,
-#    )
-
-#    threading.Thread(target=app.github_service.fetch_data, daemon=True).start()
+    app.register_blueprint(admin_bp)
 
     return app

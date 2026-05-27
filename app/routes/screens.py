@@ -1,28 +1,84 @@
 import os
-from flask import current_app as app
-from flask import Blueprint, jsonify, render_template
 
-#from app.services.github_service import GitHubService
+from flask import Blueprint, abort, jsonify, render_template
+
+from app import store
+from app.gitea_runtime import get_gitea_service
+from app.github_runtime import get_github_service
 
 screens_bp = Blueprint("screens", __name__)
 
 
 @screens_bp.route("/api/screens")
 def get_screens():
-    screens = ["/table"]
-
-#    try:
-#        if len(app.github_service.latest_data["pending_reviews"]) > 0:
-#            screens.append("/pending")
-#    except:
-#        pass
-
-    if os.getenv("COUNT_DOWN"):
-        screens.append("/countdown")
-    if os.getenv("COUNT_DOWN2"):
-        screens.append("/countdown2")
-
+    screens = store.list_screen_paths()
     return jsonify({"version": os.getenv("GIT_COMMIT", None), "screens": screens})
+
+
+@screens_bp.route("/screen/<int:screen_id>")
+def show_screen(screen_id: int):
+    screen = store.get_screen(screen_id)
+    if not screen or not screen["enabled"]:
+        abort(404)
+
+    screen_type = screen["screen_type"]
+    config = screen["config"]
+
+    if screen_type == "generic":
+        return render_template("screen/generic.html", url=config["url"])
+
+    if screen_type == "countdown":
+        try:
+            target_time = int(config["timestamp"])
+        except (KeyError, ValueError):
+            target_time = 0
+        return render_template(
+            "countdown.html",
+            target_time=target_time,
+            event_name=config.get("label", "Event"),
+        )
+
+    if screen_type == "github_table":
+        service = get_github_service(screen_id, config)
+        return render_template(
+            "table.html",
+            **service.latest_data,
+            last_updated=service.last_updated,
+        )
+
+    if screen_type == "github_pending":
+        service = get_github_service(screen_id, config)
+        return render_template(
+            "pending.html",
+            **service.latest_data,
+            last_updated=service.last_updated,
+        )
+
+    if screen_type == "gitea_table":
+        service = get_gitea_service(screen_id, config)
+        return render_template(
+            "table.html",
+            **service.latest_data,
+            last_updated=service.last_updated,
+        )
+
+    if screen_type == "gitea_pending":
+        service = get_gitea_service(screen_id, config)
+        return render_template(
+            "pending.html",
+            **service.latest_data,
+            last_updated=service.last_updated,
+        )
+
+    if screen_type == "gitea_projects":
+        service = get_gitea_service(screen_id, config)
+        return render_template(
+            "screen/projects.html",
+            projects=service.latest_data.get("projects", []),
+            last_updated=service.last_updated,
+        )
+
+    abort(404)
 
 
 @screens_bp.route("/test")
@@ -50,50 +106,3 @@ def test_screen():
     </body>
     </html>
     """
-
-
-@screens_bp.route("/pending")
-#def pending_screen():
-#    return render_template(
-#        "pending.html",
-#        **app.github_service.latest_data,
-#        last_updated=app.github_service.last_updated,
-#    )
-
-
-@screens_bp.route("/table")
-#def table_screen():
-#    return render_template(
-#        "table.html",
-#        **app.github_service.latest_data,
-#        last_updated=app.github_service.last_updated,
-#    )
-
-
-@screens_bp.route("/countdown")
-def countdown():
-    countdown_env = os.getenv("COUNT_DOWN", "0:Unknown Event")
-    timestamp, event_name = countdown_env.split(":", 1)
-
-    try:
-        target_time = int(timestamp)
-    except ValueError:
-        target_time = 0  # Fallback if invalid
-
-    return render_template(
-        "countdown.html", target_time=target_time, event_name=event_name
-    )
-
-@screens_bp.route("/countdown2")
-def countdown2():
-    countdown_env = os.getenv("COUNT_DOWN2", "0:Unknown Event")
-    timestamp, event_name = countdown_env.split(":", 1)
-
-    try:
-        target_time = int(timestamp)
-    except ValueError:
-        target_time = 0  # Fallback if invalid
-
-    return render_template(
-        "countdown.html", target_time=target_time, event_name=event_name
-    )

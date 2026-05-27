@@ -1,0 +1,19 @@
+<div class="stat-box feed-panel" id="ci-jobs">
+    <h2>Recent CI jobs</h2>
+    {% if ci_jobs %}
+    <div class="feed-list">
+        {% for job in ci_jobs %}
+        <div class="feed-row feed-row-ci">
+            <span class="feed-status feed-status-{% if job.passed is true %}pass{% elif job.passed is false %}fail{% else %}run{% endif %}">
+                {% if job.passed is true %}passed{% elif job.passed is false %}failed{% else %}{{ job.status }}{% endif %}
+            </span>
+            <span class="feed-repo">{{ job.repo_name }}</span>
+            <span class="feed-body">{{ job.name }}</span>
+            <span class="feed-meta">{{ job.duration }} · {{ job.started_at | time_ago }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="feed-empty">No recent CI jobs.</p>
+    {% endif %}
+</div>

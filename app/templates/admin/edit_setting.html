@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit setting</title>
+    <link rel="stylesheet" href="/static/styles/admin.css">
+</head>
+<body>
+    <p><a href="{{ url_for('admin.index') }}">← admin</a></p>
+    <h1>Edit setting</h1>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}<ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>{% endif %}
+    {% endwith %}
+
+    <form method="post">
+        <input type="hidden" name="old_key" value="{{ setting.key }}">
+        <p>key <input type="text" name="key" value="{{ setting.key }}" required></p>
+        <p>value <input type="text" name="value" value="{{ setting.value }}"></p>
+        <button type="submit">save</button>
+    </form>
+</body>
+</html>

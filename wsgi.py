@@ -1,14 +1,11 @@
-import os
 import logging
+import os
 
-from app import app, create_app
+from app import create_app
 
 app = create_app()
 
 if __name__ == "__main__":
-    # Setup logging
     logging.basicConfig(level=logging.INFO)
     logging.info(f"Starting server, version {os.getenv('GIT_COMMIT', 'unknown')}")
-
-    # Run app
     app.run(host="0.0.0.0")

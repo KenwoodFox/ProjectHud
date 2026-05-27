@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit screen</title>
+    <link rel="stylesheet" href="/static/styles/admin.css">
+</head>
+<body>
+    <p><a href="{{ url_for('admin.index') }}">← admin</a></p>
+    <h1>Edit screen</h1>
+    <p>{{ type_label }} · /screen/{{ screen.id }}</p>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}<ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>{% endif %}
+    {% endwith %}
+
+    <form method="post">
+        <input type="hidden" name="screen_type" value="{{ screen.screen_type }}">
+        <div id="type-fields"></div>
+        <button type="submit">save</button>
+    </form>
+
+    <script src="/static/scripts/admin.js"></script>
+    <script>
+        const SCREEN_TYPES = {{ screen_types_json | safe }};
+        renderScreenTypeFields(
+            document.getElementById("type-fields"),
+            "{{ screen.screen_type }}",
+            {{ config_json | safe }}
+        );
+    </script>
+</body>
+</html>

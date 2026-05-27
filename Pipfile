@@ -8,10 +8,10 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 psycopg2-binary = "*"
 flask-socketio = "*"
-flask = "*"
 requests = "*"
 pygithub = "*"
 python-dotenv = "*"
+flask = "*"
 
 [dev-packages]
 

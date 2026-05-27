@@ -118,6 +118,11 @@
         </div>
     </section>
 
+    <section id="activity-stats">
+        {% include "partials/commit_log.html" %}
+        {% include "partials/ci_jobs.html" %}
+    </section>
+
     <div class="page-footer">
         <p>Last updated: {{ last_updated | time_ago }}</p>
     </div>

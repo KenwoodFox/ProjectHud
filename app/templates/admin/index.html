@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project HUD — Configuration</title>
+    <link rel="stylesheet" href="/static/styles/admin.css">
+</head>
+<body>
+    <p><strong>Configuration</strong> · <a href="/">display</a>
+    <form method="post" action="{{ url_for('admin.logout') }}" style="display:inline">· <button type="submit">sign out</button></form></p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <h2>Settings</h2>
+    <p><small>e.g. refresh_duration = seconds between screen changes</small></p>
+
+    {% if settings %}
+    <table>
+        <tr><th>key</th><th>value</th><th></th></tr>
+        {% for row in settings %}
+        <tr>
+            <td>{{ row.key }}</td>
+            <td>{{ row.value }}</td>
+            <td>
+                <a href="{{ url_for('admin.edit_setting', key=row.key) }}">edit</a>
+                <form method="post" action="{{ url_for('admin.delete_setting') }}" class="inline">
+                    <input type="hidden" name="key" value="{{ row.key }}">
+                    <button type="submit">del</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p><em>none</em></p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('admin.save_setting') }}">
+        <input type="text" name="key" placeholder="key" required>
+        <input type="text" name="value" placeholder="value">
+        <button type="submit">add setting</button>
+    </form>
+
+    <hr>
+
+    <h2>Screens</h2>
+
+    {% if screens %}
+    <table>
+        <tr><th></th><th>type</th><th>path / summary</th><th></th></tr>
+        {% for screen in screens %}
+        <tr>
+            <td>
+                <form method="post" action="{{ url_for('admin.move_screen') }}" class="inline">
+                    <input type="hidden" name="id" value="{{ screen.id }}">
+                    <input type="hidden" name="direction" value="up">
+                    <button type="submit">↑</button>
+                </form>
+                <form method="post" action="{{ url_for('admin.move_screen') }}" class="inline">
+                    <input type="hidden" name="id" value="{{ screen.id }}">
+                    <input type="hidden" name="direction" value="down">
+                    <button type="submit">↓</button>
+                </form>
+            </td>
+            <td>{{ screen.type_label }}</td>
+            <td>/screen/{{ screen.id }} — {{ screen.summary }}</td>
+            <td>
+                <a href="{{ url_for('admin.edit_screen', screen_id=screen.id) }}">edit</a>
+                <form method="post" action="{{ url_for('admin.delete_screen') }}" class="inline">
+                    <input type="hidden" name="id" value="{{ screen.id }}">
+                    <button type="submit">del</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p><em>none</em></p>
+    {% endif %}
+
+    <h3>Add screen</h3>
+    <form method="post" action="{{ url_for('admin.add_screen') }}" id="add-screen-form">
+        <select name="screen_type" id="screen_type" required>
+            <option value="">— type —</option>
+            {% for value, label in screen_type_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+        <p id="type-description" hidden><small></small></p>
+        <div id="type-fields"></div>
+        <button type="submit" id="add-screen-submit" disabled>add</button>
+    </form>
+
+    <script src="/static/scripts/admin.js"></script>
+    <script>
+        const SCREEN_TYPES = {{ screen_types_json | safe }};
+        const typeSelect = document.getElementById('screen_type');
+        const typeDescription = document.getElementById('type-description');
+        const typeFields = document.getElementById('type-fields');
+        const submitBtn = document.getElementById('add-screen-submit');
+
+        typeSelect.addEventListener('change', () => {
+            const typeKey = typeSelect.value;
+            typeDescription.hidden = true;
+            submitBtn.disabled = true;
+            if (!typeKey || !SCREEN_TYPES[typeKey]) {
+                typeFields.innerHTML = '';
+                return;
+            }
+            const spec = SCREEN_TYPES[typeKey];
+            typeDescription.querySelector('small').textContent = spec.description || '';
+            typeDescription.hidden = !spec.description;
+            if (renderScreenTypeFields(typeFields, typeKey)) {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
