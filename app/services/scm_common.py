@@ -11,7 +11,6 @@ def empty_table_data() -> dict:
         "pending_reviews": [],
         "commits": [],
         "ci_jobs": [],
-        "projects": [],
     }
 
 

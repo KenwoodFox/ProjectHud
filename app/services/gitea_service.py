@@ -14,6 +14,14 @@ from app.services.scm_common import (
 )
 
 
+_UPDATE_STEPS = (
+    "update_general_data",
+    "update_pending_reviews",
+    "update_commits",
+    "update_ci_jobs",
+)
+
+
 class GiteaService:
     def __init__(self, base_url, token, organization, repos, username_mapping):
         self.base_url = base_url.rstrip("/")
@@ -27,21 +35,28 @@ class GiteaService:
 
     def fetch_data(self):
         while True:
-            try:
-                self.update_general_data()
-                self.update_pending_reviews()
-                self.update_commits()
-                self.update_ci_jobs()
-                self.update_projects()
-                print("Updated gitea data.")
-                self.last_updated = datetime.now()
-            except request_exceptions.RequestException as exc:
-                # Don't kill the background thread on transient DNS/network issues
-                print(f"Gitea update failed: {exc}")
-            except Exception as exc:
-                print(f"Gitea update failed (unexpected): {exc}")
+            for step_name in _UPDATE_STEPS:
+                step = getattr(self, step_name)
+                try:
+                    step()
+                except request_exceptions.RequestException as exc:
+                    print(f"Gitea {step.__name__} failed: {exc}")
+                except Exception as exc:
+                    print(f"Gitea {step.__name__} failed (unexpected): {exc}")
 
+            print("Updated gitea data.")
+            self.last_updated = datetime.now()
             time.sleep(int(os.getenv("API_REFRESH_DURATION", 200)))
+
+    def bootstrap(self):
+        """Load data once before the background thread's first sleep."""
+        self._repo_list()
+        for step_name in _UPDATE_STEPS:
+            try:
+                getattr(self, step_name)()
+            except (request_exceptions.RequestException, Exception) as exc:
+                print(f"Gitea bootstrap {step_name} failed: {exc}")
+        self.last_updated = datetime.now()
 
     def get_mapped_username(self, username: str) -> str:
         return self.username_mapping.get(username, username)
@@ -57,6 +72,14 @@ class GiteaService:
         response.raise_for_status()
         return response.json()
 
+    @staticmethod
+    def _as_list(data) -> list:
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            return data.get("data") or data.get("items") or []
+        return []
+
     def _repo_list(self) -> list[str]:
         if self._resolved_repos is not None:
             return self._resolved_repos
@@ -69,7 +92,7 @@ class GiteaService:
             f"/users/{self.organization}/repos",
         ):
             try:
-                data = self._api(path, {"limit": 100})
+                data = self._as_list(self._api(path, {"limit": 100}))
                 self._resolved_repos = [repo["full_name"] for repo in data]
                 return self._resolved_repos
             except requests.HTTPError:
@@ -125,7 +148,7 @@ class GiteaService:
                                 "name": label["name"],
                                 "color": label_color(label.get("color", "")),
                             }
-                            for label in issue.get("labels", [])
+                            for label in (issue.get("labels") or [])
                         ],
                         "assignees": [
                             a.get("login", "")
@@ -162,7 +185,6 @@ class GiteaService:
         pending = self.latest_data.get("pending_reviews", [])
         commits = self.latest_data.get("commits", [])
         ci_jobs = self.latest_data.get("ci_jobs", [])
-        projects = self.latest_data.get("projects", [])
         self.latest_data = {
             "milestones": milestones_data,
             "issues": issues_data,
@@ -172,7 +194,6 @@ class GiteaService:
             "pending_reviews": pending,
             "commits": commits,
             "ci_jobs": ci_jobs,
-            "projects": projects,
         }
 
     def update_pending_reviews(self):
@@ -311,35 +332,3 @@ class GiteaService:
 
         all_jobs.sort(key=lambda j: j["started_at"], reverse=True)
         self.latest_data["ci_jobs"] = all_jobs[:40]
-
-    def update_projects(self):
-        all_projects = []
-
-        for repo_name in self._repo_list():
-            owner, name = self._split_repo(repo_name)
-            short_repo = name
-            try:
-                projects = self._api(
-                    f"/repos/{owner}/{name}/projects", {"page": 1, "limit": 20}
-                )
-            except requests.HTTPError:
-                continue
-
-            if not isinstance(projects, list):
-                continue
-
-            for proj in projects:
-                title = proj.get("title") or proj.get("name") or "Project"
-                all_projects.append(
-                    {
-                        "repo_name": short_repo,
-                        "title": title,
-                        "description": (proj.get("description") or "").strip(),
-                        "updated_at": parse_iso_datetime(proj.get("updated_at")),
-                    }
-                )
-
-        all_projects.sort(
-            key=lambda p: p.get("updated_at") or datetime.min, reverse=True
-        )
-        self.latest_data["projects"] = all_projects[:40]

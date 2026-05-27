@@ -166,46 +166,6 @@ SCREEN_TYPES = {
             },
         ],
     },
-    "gitea_projects": {
-        "label": "Gitea — projects",
-        "description": "Repository project boards for a Gitea organization.",
-        "fields": [
-            {
-                "name": "base_url",
-                "label": "Gitea URL",
-                "type": "url",
-                "placeholder": "https://gitea.example.com",
-                "required": True,
-            },
-            {
-                "name": "token",
-                "label": "Gitea token",
-                "type": "password",
-                "required": True,
-            },
-            {
-                "name": "organization",
-                "label": "Organization",
-                "type": "text",
-                "placeholder": "my-org",
-                "required": True,
-            },
-            {
-                "name": "repos",
-                "label": "Repositories (optional)",
-                "type": "text",
-                "placeholder": "org/repo-one — leave blank for all org repos",
-                "required": False,
-            },
-            {
-                "name": "username_map",
-                "label": "Display names (optional)",
-                "type": "text",
-                "placeholder": "gitea-user:Display Name",
-                "required": False,
-            },
-        ],
-    },
 }
 
 
@@ -236,9 +196,7 @@ def validate_config(
         if value:
             cleaned[name] = value
 
-    if screen_type in ("gitea_table", "gitea_pending", "gitea_projects") and cleaned.get(
-        "base_url"
-    ):
+    if screen_type in ("gitea_table", "gitea_pending") and cleaned.get("base_url"):
         url = cleaned["base_url"]
         if not url.startswith(("http://", "https://")):
             raise ValueError("URL must start with http:// or https://")
@@ -270,8 +228,4 @@ def screen_summary(screen_type: str, config: dict) -> str:
         org = config.get("organization", "")
         repos = config.get("repos", "")
         return repos or org or "Gitea"
-    if screen_type == "gitea_projects":
-        org = config.get("organization", "")
-        repos = config.get("repos", "")
-        return repos or org or "Gitea projects"
     return screen_type

@@ -70,14 +70,6 @@ def show_screen(screen_id: int):
             last_updated=service.last_updated,
         )
 
-    if screen_type == "gitea_projects":
-        service = get_gitea_service(screen_id, config)
-        return render_template(
-            "screen/projects.html",
-            projects=service.latest_data.get("projects", []),
-            last_updated=service.last_updated,
-        )
-
     abort(404)
 
 

@@ -25,5 +25,9 @@ def get_gitea_service(screen_id: int, config: dict) -> GiteaService:
             username_mapping=_parse_username_map(config.get("username_map", "")),
         )
         services[screen_id] = service
+        try:
+            service.bootstrap()
+        except Exception as exc:
+            print(f"Gitea bootstrap failed: {exc}")
         threading.Thread(target=service.fetch_data, daemon=True).start()
     return services[screen_id]

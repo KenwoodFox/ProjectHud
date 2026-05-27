@@ -121,7 +121,6 @@ class GitHubService:
             "pending_reviews": pending,
             "commits": [],
             "ci_jobs": self.latest_data.get("ci_jobs", []),
-            "projects": [],
         }
 
     def update_ci_jobs(self):
