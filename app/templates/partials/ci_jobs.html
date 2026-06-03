@@ -1,7 +1,8 @@
 <div class="stat-box feed-panel" id="ci-jobs">
     <h2>Recent CI jobs</h2>
     {% if ci_jobs %}
-    <div class="feed-list">
+    <div class="feed-list" data-auto-scroll>
+        <div class="auto-scroll-content">
         {% for job in ci_jobs %}
         <div class="feed-row feed-row-ci">
             <span class="feed-status feed-status-{% if job.passed is true %}pass{% elif job.passed is false %}fail{% else %}run{% endif %}">
@@ -12,6 +13,7 @@
             <span class="feed-meta">{{ job.duration }} · {{ job.started_at | time_ago }}</span>
         </div>
         {% endfor %}
+        </div>
     </div>
     {% else %}
     <p class="feed-empty">No recent CI jobs.</p>

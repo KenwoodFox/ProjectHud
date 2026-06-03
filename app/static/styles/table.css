@@ -169,12 +169,11 @@ body {
   font-weight: normal;
   position: absolute;
   bottom: 0px;
+  left: 0;
+  right: 0;
   text-align: center;
   width: 100%;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-size: min(0.3em, 4vw);
 }
 
@@ -184,6 +183,7 @@ body {
 
 .card-data {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -352,9 +352,7 @@ body {
 .feed-repo {
   color: #ffa500;
   font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
 }
 
 .feed-sha {
@@ -364,16 +362,14 @@ body {
 }
 
 .feed-body {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
 }
 
 .feed-meta {
   color: #888;
   font-size: 11px;
-  white-space: nowrap;
   text-align: right;
+  min-width: 0;
 }
 
 .feed-empty,

@@ -1,7 +1,8 @@
 <div class="stat-box feed-panel" id="commits">
     <h2>Recent commits</h2>
     {% if commits %}
-    <div class="feed-list">
+    <div class="feed-list" data-auto-scroll>
+        <div class="auto-scroll-content">
         {% for commit in commits %}
         <div class="feed-row">
             <span class="feed-repo">{{ commit.repo_name }}</span>
@@ -10,6 +11,7 @@
             <span class="feed-meta">{{ commit.author }} · {{ commit.committed_at | time_ago }}</span>
         </div>
         {% endfor %}
+        </div>
     </div>
     {% else %}
     <p class="feed-empty">Commit log coming soon.</p>

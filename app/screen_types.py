@@ -126,6 +126,31 @@ SCREEN_TYPES = {
             },
         ],
     },
+    "inventree_dashboard": {
+        "label": "InvenTree — inventory dashboard",
+        "description": "Recent parts, outstanding orders, and production builds.",
+        "fields": [
+            {
+                "name": "base_url",
+                "label": "InvenTree URL",
+                "type": "url",
+                "placeholder": "https://inventree.example.com",
+                "required": True,
+            },
+            {
+                "name": "username",
+                "label": "Username",
+                "type": "text",
+                "required": True,
+            },
+            {
+                "name": "password",
+                "label": "Password",
+                "type": "password",
+                "required": True,
+            },
+        ],
+    },
     "gitea_pending": {
         "label": "Gitea — pending reviews",
         "description": "Who still needs to review open PRs on Gitea.",
@@ -173,7 +198,7 @@ def screen_type_choices():
     return [(key, spec["label"]) for key, spec in SCREEN_TYPES.items()]
 
 
-_SENSITIVE_FIELD_NAMES = {"token"}
+_SENSITIVE_FIELD_NAMES = {"token", "password"}
 
 
 def validate_config(
@@ -196,11 +221,15 @@ def validate_config(
         if value:
             cleaned[name] = value
 
-    if screen_type in ("gitea_table", "gitea_pending") and cleaned.get("base_url"):
+    if screen_type in ("gitea_table", "gitea_pending", "inventree_dashboard") and cleaned.get(
+        "base_url"
+    ):
+        from app.services.inventree_service import normalize_inventree_base_url
+
         url = cleaned["base_url"]
         if not url.startswith(("http://", "https://")):
             raise ValueError("URL must start with http:// or https://")
-        cleaned["base_url"] = url.rstrip("/")
+        cleaned["base_url"] = normalize_inventree_base_url(url)
 
     if screen_type == "generic" and cleaned.get("url"):
         url = cleaned["url"]
@@ -228,4 +257,8 @@ def screen_summary(screen_type: str, config: dict) -> str:
         org = config.get("organization", "")
         repos = config.get("repos", "")
         return repos or org or "Gitea"
+    if screen_type == "inventree_dashboard":
+        user = config.get("username", "")
+        host = config.get("base_url", "")
+        return f"{user} @ {host}" if user and host else "InvenTree"
     return screen_type

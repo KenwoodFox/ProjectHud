@@ -4,10 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/styles/pending.css">
+    <link rel="stylesheet" href="/static/styles/scroll-feed.css">
+    <link rel="stylesheet" href="/static/styles/text-fit.css">
+    <script src="/static/scripts/text-fit.js" defer></script>
+    <script src="/static/scripts/scroll-feed.js" defer></script>
 </head>
 
 <body>
-    <div class="pending-reviews">
+    <div class="pending-reviews" data-auto-scroll>
+        <div class="auto-scroll-content">
         {% for reviewer in pending_reviews %}
         <div class="reviewer">
             <div class="reviewer-name">{{ reviewer.name }}</div>
@@ -21,6 +26,7 @@
             </div>
         </div>
         {% endfor %}
+        </div>
     </div>
 
     <div class="page-footer">

@@ -24,9 +24,24 @@ def _ensure_database_writable():
         )
 
 
+def _purge_unknown_screens():
+    """Drop screens whose type was removed from the app (no legacy handlers)."""
+    stale = list(
+        db.session.scalars(
+            db.select(Screen).where(Screen.screen_type.notin_(SCREEN_TYPES))
+        )
+    )
+    if not stale:
+        return
+    for row in stale:
+        db.session.delete(row)
+    db.session.commit()
+
+
 def init_db():
     _ensure_database_writable()
     db.create_all()
+    _purge_unknown_screens()
     if db.session.scalar(db.select(func.count()).select_from(Setting)) == 0:
         _seed()
 

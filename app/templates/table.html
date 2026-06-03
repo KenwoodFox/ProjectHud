@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProjectHUD</title>
     <link rel="stylesheet" href="/static/styles/table.css">
+    <link rel="stylesheet" href="/static/styles/scroll-feed.css">
+    <link rel="stylesheet" href="/static/styles/text-fit.css">
+    <script src="/static/scripts/text-fit.js" defer></script>
+    <script src="/static/scripts/scroll-feed.js" defer></script>
 </head>
 
 <body>
@@ -36,7 +40,8 @@
         <!-- Issues Section -->
         <div class="stat-box" id="issues">
             <h2>Issues ({{ issues_count }})</h2>
-            <div class="card-container">
+            <div class="card-container" data-auto-scroll>
+                <div class="auto-scroll-content">
                 {% for issue in issues %}
                 <div class="card">
                     <!-- Number & Repo Name -->
@@ -70,13 +75,15 @@
                     </div>
                 </div>
                 {% endfor %}
+                </div>
             </div>
         </div>
 
         <!-- Pull Requests Section -->
         <div class="stat-box" id="pull-requests">
             <h2>Pull Requests ({{ pull_requests_count }})</h2>
-            <div class="card-container">
+            <div class="card-container" data-auto-scroll>
+                <div class="auto-scroll-content">
                 {% for pr in pull_requests %}
                 <div class="card {% if pr.is_draft %}draft-pr{% endif %}">
                     <!-- Number & Repo Name -->
@@ -114,6 +121,7 @@
                     </div>
                 </div>
                 {% endfor %}
+                </div>
             </div>
         </div>
     </section>

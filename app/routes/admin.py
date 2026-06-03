@@ -19,7 +19,7 @@ from app.screen_types import SCREEN_TYPES, screen_summary, screen_type_choices, 
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
-_SENSITIVE_FIELDS = {"token"}
+_SENSITIVE_FIELDS = {"token", "password"}
 
 
 def admin_password_configured() -> bool:
@@ -69,7 +69,7 @@ def _config_from_form(screen_type: str) -> dict:
 
 
 def _invalidate_screen_service(screen_id: int):
-    for ext_key in ("github_services", "gitea_services"):
+    for ext_key in ("github_services", "gitea_services", "inventree_services"):
         services = current_app.extensions.get(ext_key)
         if services and screen_id in services:
             del services[screen_id]

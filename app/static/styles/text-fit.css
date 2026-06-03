@@ -1,0 +1,41 @@
+/* Horizontal marquee when text overflows its cell */
+
+.text-fit {
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
+}
+
+.text-fit-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.text-fit-inner {
+  flex-shrink: 0;
+}
+
+.text-fit-gap {
+  flex-shrink: 0;
+  padding-left: 2em;
+}
+
+.text-fit-overflow .text-fit-track {
+  animation: text-fit-marquee var(--text-fit-duration, 14s) linear infinite;
+}
+
+.text-fit-overflow:hover .text-fit-track {
+  animation-play-state: paused;
+}
+
+@keyframes text-fit-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

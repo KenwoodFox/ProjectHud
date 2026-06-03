@@ -5,6 +5,7 @@ from flask import Blueprint, abort, jsonify, render_template
 from app import store
 from app.gitea_runtime import get_gitea_service
 from app.github_runtime import get_github_service
+from app.inventree_runtime import get_inventree_service
 
 screens_bp = Blueprint("screens", __name__)
 
@@ -66,6 +67,14 @@ def show_screen(screen_id: int):
         service = get_gitea_service(screen_id, config)
         return render_template(
             "pending.html",
+            **service.latest_data,
+            last_updated=service.last_updated,
+        )
+
+    if screen_type == "inventree_dashboard":
+        service = get_inventree_service(screen_id, config)
+        return render_template(
+            "inventree.html",
             **service.latest_data,
             last_updated=service.last_updated,
         )

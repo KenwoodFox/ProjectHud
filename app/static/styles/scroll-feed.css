@@ -1,0 +1,69 @@
+/* Vertical slow-scroll for overflowing lists (signage displays) */
+
+[data-auto-scroll] {
+  overflow: hidden;
+  position: relative;
+}
+
+[data-auto-scroll] .auto-scroll-content {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+[data-auto-scroll].auto-scroll-active .auto-scroll-track {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: auto-scroll-vertical var(--scroll-duration, 50s) linear infinite;
+  will-change: transform;
+}
+
+[data-auto-scroll].auto-scroll-active:hover .auto-scroll-track {
+  animation-play-state: paused;
+}
+
+@keyframes auto-scroll-vertical {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.feed-list[data-auto-scroll] {
+  overflow: hidden;
+  max-height: 36vh;
+}
+
+.feed-list[data-auto-scroll] .auto-scroll-content {
+  gap: 4px;
+}
+
+/* Issue/PR card lists */
+.card-container[data-auto-scroll] {
+  max-height: 78vh;
+  overflow: hidden;
+}
+
+.card-container[data-auto-scroll] .auto-scroll-content {
+  gap: 4px;
+}
+
+.card-container[data-auto-scroll].auto-scroll-active .auto-scroll-track {
+  gap: 4px;
+}
+
+/* Pending reviews grid */
+.pending-reviews[data-auto-scroll] {
+  max-height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+.pending-reviews[data-auto-scroll].auto-scroll-active .auto-scroll-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  width: 100%;
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectHUD — InvenTree</title>
+    <link rel="stylesheet" href="/static/styles/inventree.css">
+    <link rel="stylesheet" href="/static/styles/scroll-feed.css">
+    <link rel="stylesheet" href="/static/styles/text-fit.css">
+    <script src="/static/scripts/text-fit.js" defer></script>
+    <script src="/static/scripts/scroll-feed.js" defer></script>
+</head>
+
+<body>
+    <section id="inventree-stats">
+        <div class="stat-box" id="recent-parts">
+            <h2>Recent parts ({{ recent_parts_count }})</h2>
+            <div class="feed-panel-inner" data-auto-scroll>
+                <div class="auto-scroll-content">
+                    {% for part in recent_parts %}
+                    <div class="inv-row">
+                        <span class="inv-primary">{{ part.name }}</span>
+                        {% if part.ipn %}<span class="inv-tag">{{ part.ipn }}</span>{% endif %}
+                        <span class="inv-body">{{ part.description }}</span>
+                        <span class="inv-meta">
+                            {% if part.category %}{{ part.category }} · {% endif %}
+                            {{ part.created_at | time_ago }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <p class="feed-empty">No parts loaded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-box" id="purchase-orders">
+            <h2>Purchase orders ({{ purchase_orders_count }})</h2>
+            <div class="feed-panel-inner" data-auto-scroll>
+                <div class="auto-scroll-content">
+                    {% for order in purchase_orders %}
+                    <div class="inv-row {% if order.overdue %}inv-overdue{% endif %}">
+                        <span class="inv-primary">{{ order.reference }}</span>
+                        <span class="inv-tag">{{ order.supplier }}</span>
+                        <span class="inv-body">{{ order.description }}</span>
+                        <span class="inv-meta">
+                            {{ order.status }}
+                            {% if order.target_date %} · due {{ order.target_date }}{% endif %}
+                        </span>
+                    </div>
+                    {% else %}
+                    <p class="feed-empty">No outstanding purchase orders.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-box" id="sales-orders">
+            <h2>Sales orders ({{ sales_orders_count }})</h2>
+            <div class="feed-panel-inner" data-auto-scroll>
+                <div class="auto-scroll-content">
+                    {% for order in sales_orders %}
+                    <div class="inv-row {% if order.overdue %}inv-overdue{% endif %}">
+                        <span class="inv-primary">{{ order.reference }}</span>
+                        <span class="inv-tag">{{ order.customer }}</span>
+                        <span class="inv-body">{{ order.description }}</span>
+                        <span class="inv-meta">
+                            {{ order.status }}
+                            {% if order.target_date %} · due {{ order.target_date }}{% endif %}
+                        </span>
+                    </div>
+                    {% else %}
+                    <p class="feed-empty">No outstanding sales orders.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-box" id="build-orders">
+            <h2>Production builds ({{ build_orders_count }})</h2>
+            <div class="feed-panel-inner" data-auto-scroll>
+                <div class="auto-scroll-content">
+                    {% for build in build_orders %}
+                    <div class="inv-row {% if build.overdue %}inv-overdue{% endif %}">
+                        <span class="inv-primary">{{ build.reference }}</span>
+                        <span class="inv-tag">{{ build.progress }}</span>
+                        <span class="inv-body">{{ build.title }} — {{ build.part_name }}</span>
+                        <span class="inv-meta">
+                            {{ build.status }}
+                            {% if build.target_date %} · due {{ build.target_date }}{% endif %}
+                        </span>
+                    </div>
+                    {% else %}
+                    <p class="feed-empty">No active build orders.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="page-footer">
+        <p>Last updated: {{ last_updated | time_ago }}</p>
+    </div>
+</body>
+
+</html>
