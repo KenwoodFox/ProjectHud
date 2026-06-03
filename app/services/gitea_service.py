@@ -107,6 +107,32 @@ class GiteaService:
             return owner, name
         return self.organization, repo_name
 
+    def _pr_line_counts(self, owner: str, name: str, pr: dict) -> tuple[int, int]:
+        """Gitea's PR list endpoint omits diff stats; fetch detail or files when needed."""
+        additions = pr.get("additions")
+        deletions = pr.get("deletions")
+        if additions is not None and deletions is not None:
+            return int(additions), int(deletions)
+
+        index = pr["number"]
+        try:
+            detail = self._api(f"/repos/{owner}/{name}/pulls/{index}")
+            additions = detail.get("additions")
+            deletions = detail.get("deletions")
+            if additions is not None and deletions is not None:
+                return int(additions), int(deletions)
+        except request_exceptions.RequestException:
+            pass
+
+        try:
+            files = self._api(f"/repos/{owner}/{name}/pulls/{index}/files")
+            return (
+                sum(int(f.get("additions") or 0) for f in files),
+                sum(int(f.get("deletions") or 0) for f in files),
+            )
+        except request_exceptions.RequestException:
+            return 0, 0
+
     def update_general_data(self):
         milestones_data = []
         issues_data = []
@@ -163,6 +189,7 @@ class GiteaService:
                 f"/repos/{owner}/{name}/pulls", {"state": "open", "limit": 50}
             ):
                 user = pr.get("user") or {}
+                additions, deletions = self._pr_line_counts(owner, name, pr)
                 pr_data.append(
                     {
                         "number": pr["number"],
@@ -177,8 +204,8 @@ class GiteaService:
                         ],
                         "updated_at": parse_iso_datetime(pr.get("updated_at")),
                         "is_draft": pr.get("draft", False),
-                        "additions": pr.get("additions", 0) or 0,
-                        "deletions": pr.get("deletions", 0) or 0,
+                        "additions": additions,
+                        "deletions": deletions,
                     }
                 )
 
